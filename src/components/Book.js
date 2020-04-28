@@ -10,14 +10,16 @@ class Book extends Component {
       <li>
         <div className="book">
           <div className="book-top">
-            <div
-              className="book-cover"
-              style={{
-                width: 128,
-                height: 193,
-                backgroundImage: `url("${imageLinks.thumbnail}")`,
-              }}
-            />
+            {imageLinks && (
+              <div
+                className="book-cover"
+                style={{
+                  width: 128,
+                  height: 193,
+                  backgroundImage: `url("${imageLinks.thumbnail}")`,
+                }}
+              />
+            )}
             <div className="book-shelf-changer">
               <select
                 value={shelf || "none"}
@@ -34,11 +36,12 @@ class Book extends Component {
             </div>
           </div>
           <div className="book-title">{title}</div>
-          {authors.map((author) => (
-            <div key={author} className="book-authors">
-              {author}
-            </div>
-          ))}
+          {authors &&
+            authors.map((author) => (
+              <div key={author} className="book-authors">
+                {author}
+              </div>
+            ))}
         </div>
       </li>
     );

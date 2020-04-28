@@ -40,6 +40,7 @@ class BooksApp extends React.Component {
     });
   };
 
+  // shelf change on main page
   updateMainShelf = (res, book, shelf, present = true) => {
     const updatedShelf = Object.assign({}, this.state.shelf);
     if (present) {
@@ -64,6 +65,7 @@ class BooksApp extends React.Component {
     }
   };
 
+  // shelf change on search
   updateSearchShelf = (res) => {
     const updatedShelf = Object.assign({}, this.state.searchResults);
     updatedShelf[res.id].shelf = res.shelf;
@@ -72,27 +74,41 @@ class BooksApp extends React.Component {
 
   onShelfChangeSearch = async (book, shelf) => {
     try {
-      await update(book, shelf);
+      await update(Object.assign(book), shelf);
       const res = await get(book.id);
+      this.updateMainShelf(res, book, shelf, shelf === "none");
       this.updateSearchShelf(res);
-      this.updateMainShelf(res, book, shelf, false);
     } catch (err) {
       console.log("error changing shelf: ", err);
     }
   };
 
+  // search for books
   onSearchChange = async (e) => {
-    const res = await search(e.target.value);
-    if (!res || res.error) {
+    if (!e.target.value) {
+      this.setState({
+        searchResults: {},
+      });
       return;
     }
-    const normalizedRes = {};
-    res.forEach((resItem) => {
-      normalizedRes[resItem.id] = resItem;
-    });
-    this.setState({
-      searchResults: normalizedRes,
-    });
+    try {
+      const res = await search(e.target.value);
+      if (!res || res.error) {
+        this.setState({
+          searchResults: {},
+        });
+        return;
+      }
+      const normalizedRes = {};
+      res.forEach((resItem) => {
+        normalizedRes[resItem.id] = resItem;
+      });
+      this.setState({
+        searchResults: normalizedRes,
+      });
+    } catch (err) {
+      console.log("err: ", err);
+    }
   };
 
   render() {
